@@ -2,9 +2,11 @@
   hosts: all
   tasks:
 
+    - name: Whoami
+      ansible.builtin.command: whoami
+      register: _command
+
     - name: Create Hello World file
       ansible.builtin.copy:
         content: "Hello World"
-        dest: /home/ta/hello-world.txt
-    
-    
+        dest: /home/{{ _command.stdout }}/hello-world.txt
