@@ -1,0 +1,6 @@
+all:
+  vars:
+    ansible_user: ta
+  hosts:
+    ta-lxlt:
+      ansible_host: 192.168.4.58

@@ -1,0 +1,10 @@
+- name: Play 1
+  hosts: all
+  tasks:
+
+    - name: Create Hello World file
+      ansible.builtin.copy:
+        content: "Hello World"
+        dest: /home/ta/hello-world.txt
+    
+    
