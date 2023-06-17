@@ -4,3 +4,4 @@ all:
   hosts:
     ta-lxlt:
       ansible_host: 192.168.4.58
+      ansible_ssh_private_key_file: ~/.ssh/ansible
