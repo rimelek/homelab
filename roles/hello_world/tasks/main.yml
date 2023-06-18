@@ -1,0 +1,4 @@
+- name: Create Hello World file
+  ansible.builtin.copy:
+    content: "Hello World"
+    dest: "{{ hello_world_dest }}"

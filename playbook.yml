@@ -1,12 +1,8 @@
 - name: Play 1
   hosts: all
-  tasks:
+  roles:
 
-    - name: Whoami
-      ansible.builtin.command: whoami
-      register: _command
+    - role: hello_world
+      become: true
+      hello_world_dest: /opt/hello-world.txt
 
-    - name: Create Hello World file
-      ansible.builtin.copy:
-        content: "Hello World"
-        dest: /home/{{ _command.stdout }}/hello-world.txt

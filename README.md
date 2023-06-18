@@ -20,3 +20,36 @@ the content so you will use your IP addresses and usernames.
 ```bash
 cp inventory-example.yml inventory.yml
 ```
+
+Optionally, if you want to start an SSH agent, run:
+
+```bash
+ssh-agent $SHELL
+```
+
+If you generated an SSH private key at `~/.ssh/ansible` the it will be added automatically
+when you souce the homelab env scripts. Otherwise you need to run:
+
+```bash
+ssh-add $PATH_OF_THE_SSH_PRIVATE_KEY
+```
+
+Use the actual path of the SSH private key instead of the variable.
+
+If you created a python virtual environment with the name "venv", you can activate it using
+
+```bash
+source homelab-env.sh
+```
+
+Override the `HOMELAB_ENV` variable to customize the environment:
+
+```bash
+HOMELAB_ENV=custom-env source homelab-env.sh
+```
+
+If you want `venv-linux` on linux and `venv-darwin` on macOS, you can run
+
+```bash
+source homelab-env-os.sh
+```

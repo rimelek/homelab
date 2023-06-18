@@ -1,0 +1,2 @@
+hello_world_user: "{{ ansible_user }}"
+hello_world_dest: "/home/{{ hello_world_user }}/hello-world.txt"
