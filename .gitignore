@@ -1,3 +1,6 @@
 /venv
 /venv-linux
 /inventory.yml
+
+# for macOS
+/.DS_Store
