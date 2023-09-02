@@ -36,6 +36,18 @@ ssh-add $PATH_OF_THE_SSH_PRIVATE_KEY
 
 Use the actual path of the SSH private key instead of the variable.
 
+Since Ansible 8.0.0 requires a recent Python version, if you are on Ubuntu 22.04 for example you can install Nix and run the following command to create the Python environment using Python 3.11:
+
+```bash
+./create-nix-env.sh venv
+```
+
+or
+
+```bash
+./create-nix-env.sh venv-linux
+```
+
 If you created a python virtual environment with the name "venv", you can activate it using
 
 ```bash
