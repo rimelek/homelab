@@ -8,6 +8,7 @@ The project contains code written for the tutorial, but you can also use parts o
 if you refer to this repository.
 
 Tutorial on Youtube in English: <https://www.youtube.com/watch?v=K9grKS335Mo&list=PLzMwEMzC_9o7VN1qlfh-avKsgmiU8Jofv>
+Tutorial on Youtube in Hungarian: <https://www.youtube.com/watch?v=dmg7lYsj374&list=PLUHwLCacitP4DU2v_DEHQI0U2tQg0a421>
 
 Note: The inventory.yml file is not shared since that depends on the actual environment
 so it will be different for everyone. If you want to learn more about the inventory file,
