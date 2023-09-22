@@ -1,0 +1,2 @@
+zfs_pool_name: default
+zfs_pool_disks: []

@@ -1,0 +1,30 @@
+- name: Install LXD snap package
+  become: true
+  community.general.snap:
+    state: present
+    name: lxd
+    channel: "{{ lxd_install_snap_channel }}"
+
+- name: Initialize LXD
+  when: lxd_install_init_enabled | bool
+  block:
+
+    - name: Create LXD config folder
+      become: true
+      ansible.builtin.file:
+        state: directory
+        path: "{{ lxd_install_init_config_dir }}"
+        mode: 0700
+
+    - name: Copy LXD config
+      become: true
+      ansible.builtin.copy:
+        src: lxd-init.yml
+        dest: "{{ lxd_install_init_config_file_path }}"
+        mode: 0600
+      register: _copy_init_task
+
+    - name: Apply LXD config
+      when: _copy_init_task.changed
+      become: true
+      ansible.builtin.shell: lxd init --preseed < "{{ lxd_install_init_config_file_path }}"

@@ -1,6 +1,8 @@
 all:
   vars:
     ansible_user: ta
+    config_lxd_zfs_pool_disks:
+      - /dev/disk/by-id/scsi-1ATA_Samsung_SSD_850_EVO_500GB_S2RBNX0J103301N-part6
   hosts:
     ta-lxlt:
       ansible_host: 192.168.4.58

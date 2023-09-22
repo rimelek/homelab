@@ -1,0 +1,5 @@
+lxd_install_snap_channel: 5.0/stable
+lxd_install_init_enabled: true
+lxd_install_init_config_dir: /opt/lxd
+lxd_install_init_config_file_name: init.yml
+lxd_install_init_config_file_path: "{{ lxd_install_init_config_dir }}/{{ lxd_install_init_config_file_name }}"

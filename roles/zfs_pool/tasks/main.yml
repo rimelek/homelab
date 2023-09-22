@@ -1,0 +1,16 @@
+- name: Install zfslinux-utils
+  become: true
+  ansible.builtin.package:
+    name: zfsutils-linux
+    state: present
+
+- name: Get zpool facts
+  ignore_errors: true
+  community.general.zpool_facts:
+    name: "{{ zfs_pool_name }}"
+  register: _zpool_facts_task
+
+- name: "Create ZFS pool: {{ zfs_pool_name }}"
+  when: _zpool_facts_task.failed
+  become: true
+  ansible.builtin.command: "zpool create {{ zfs_pool_name }} {{ zfs_pool_disks | join(' ') }}" 
