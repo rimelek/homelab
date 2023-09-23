@@ -4,5 +4,5 @@
     - role: zfs_pool
       zfs_pool_name: lxd-default
       zfs_pool_disks: "{{ config_lxd_zfs_pool_disks }}"
-        
+
     - role: lxd_install
