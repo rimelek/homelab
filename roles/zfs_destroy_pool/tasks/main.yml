@@ -1,0 +1,37 @@
+- name: Fail if pool name is not provided
+  when: zfs_destroy_pool_name | default('', true) | trim == ''
+  ansible.builtin.fail:
+    msg: "zfs_destroy_pool_name must not be empty"
+
+- name: Confirmation of destroying the pool and purging the disks
+  ansible.builtin.pause:
+    prompt: 'Type "yes" and press ENTER to continue or press CTRL+C and "a" to abort'
+  register: _confirmation_prompt
+
+- name: 'Fail if the user did not type "yes"'
+  when: _confirmation_prompt.user_input != "yes"
+  ansible.builtin.fail:
+    msg: 'User input was: {{ _confirmation_prompt.user_input | to_json }}, not "yes". Aborting.'
+
+- name: Get zpool facts
+  ignore_errors: true
+  community.general.zpool_facts:
+    name: "{{ zfs_destroy_pool_name }}"
+  register: _zpool_facts_task
+
+- name: "Get disks in zpool: {{ zfs_destroy_pool_name }}"
+  when:
+    - zfs_destroy_pool_disks_autodetect | bool
+    - not _zpool_facts_task.failed
+  ansible.builtin.shell: "zpool list -H -P -v lxd-default | tail -n +2 | awk '{print $1}' | grep '^/'"
+  register: _zpool_disks_command
+
+- name: Destroy ZFS pool
+  when: not _zpool_facts_task.failed
+  become: true
+  ansible.builtin.command: "zpool destroy {{ zfs_destroy_pool_name }}"
+
+- name: Purge disks
+  become: true
+  ansible.builtin.command: "wipefs --all {{ item }}"
+  loop: "{{ _zpool_disks_command.stdout_lines if not _zpool_disks_command.skipped | default(false) else zfs_destroy_pool_disks }}"

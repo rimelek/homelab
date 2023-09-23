@@ -1,0 +1,23 @@
+- name: Remove LXD snap package
+  become: true
+  community.general.snap:
+    name: lxd
+    state: absent
+
+- name: Install jq
+  ansible.builtin.package:
+    name: jq
+    state: present
+
+- name: Get the IDs of the saved LXD snapshots
+  changed_when: false
+  # snap saved
+  ansible.builtin.shell: |
+    curl -sS --unix-socket /run/snapd.socket http://localhost/v2/snapshots?snaps=lxd \
+      | jq -r '[.result[].id]'
+  register: _snap_lxd_snapshot_command
+
+- name: Forget saved snapshots
+  become: true
+  ansible.builtin.command: "snap forget {{ item }}"
+  loop: "{{ _snap_lxd_snapshot_command.stdout | from_json }}"

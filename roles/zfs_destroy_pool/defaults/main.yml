@@ -1,0 +1,3 @@
+zfs_destroy_pool_name:
+zfs_destroy_pool_disks_autodetect: true
+zfs_destroy_pool_disks: []
