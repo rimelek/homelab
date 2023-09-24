@@ -4,9 +4,11 @@
     name: lxd
     state: absent
 
-- name: Install jq
+- name: Install requirements to use the snapd API
   ansible.builtin.package:
-    name: jq
+    name:
+      - curl
+      - jq
     state: present
 
 - name: Get the IDs of the saved LXD snapshots
