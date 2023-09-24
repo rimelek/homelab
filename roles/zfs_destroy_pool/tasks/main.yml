@@ -23,7 +23,7 @@
   when:
     - zfs_destroy_pool_disks_autodetect | bool
     - not _zpool_facts_task.failed
-  ansible.builtin.shell: "zpool list -H -P -v lxd-default | tail -n +2 | awk '{print $1}' | grep '^/'"
+  ansible.builtin.shell: "zpool list -H -P -v {{ zfs_destroy_pool_name }} | tail -n +2 | awk '{print $1}' | grep '^/'"
   register: _zpool_disks_command
 
 - name: Destroy ZFS pool
