@@ -31,7 +31,7 @@
   become: true
   ansible.builtin.command: "zpool destroy {{ zfs_destroy_pool_name }}"
 
-- name: Purge disks
+- name: Wipe filesystem signatures
   become: true
   ansible.builtin.command: "wipefs --all {{ item }}"
   loop: "{{ _zpool_disks_command.stdout_lines if not _zpool_disks_command.skipped | default(false) else zfs_destroy_pool_disks }}"
