@@ -21,3 +21,9 @@
   become: true
   ansible.builtin.command: "snap forget {{ item }}"
   loop: "{{ _snap_lxd_snapshot_command.stdout | from_json }}"
+
+- name: Remove init config
+  become: true
+  ansible.builtin.file:
+    path: "{{ lxd_remove_init_config_file_path }}"
+    state: absent
