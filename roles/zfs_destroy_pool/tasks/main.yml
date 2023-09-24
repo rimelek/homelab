@@ -38,4 +38,9 @@
 - name: Wipe filesystem signatures
   become: true
   ansible.builtin.command: "wipefs --all {{ item }}"
-  loop: "{{ _zpool_disks_command.stdout_lines if not _zpool_disks_command.skipped | default(false) else zfs_destroy_pool_disks }}"
+  loop: |
+    {{
+      _zpool_disks_command.stdout_lines
+        if zfs_destroy_pool_disks_autodetect | bool
+        else zfs_destroy_pool_disks
+    }}
