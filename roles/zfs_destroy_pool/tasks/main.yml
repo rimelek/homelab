@@ -40,7 +40,7 @@
   ansible.builtin.command: "wipefs --all {{ item }}"
   loop: |
     {{
-      _zpool_disks_command.stdout_lines
+      _zpool_disks_command.stdout_lines | default([])
         if zfs_destroy_pool_disks_autodetect | bool
         else zfs_destroy_pool_disks
     }}
