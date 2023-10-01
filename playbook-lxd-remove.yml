@@ -4,5 +4,3 @@
     - role: lxd_remove
     - role: zfs_destroy_pool
       zfs_destroy_pool_name: lxd-default
-      
-        
