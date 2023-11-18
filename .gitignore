@@ -1,6 +1,8 @@
 /venv
 /venv-linux
 /inventory.yml
+/var
+/secrets.yml
 
 # for macOS
 /.DS_Store
