@@ -1,12 +1,12 @@
 all:
   vars:
-    ansible_user: ansible
+    ansible_user: ansible-homelab
     config_lxd_zfs_pool_disks:
       - /dev/disk/by-id/scsi-1ATA_Samsung_SSD_850_EVO_500GB_S2RBNX0J103301N-part6
-    sops_age_keyfile: var/age/key
-    sops: "{{ lookup('community.sops.sops', 'secrets.enc.yml') | ansible.builtin.from_yaml }}"
+    sops: "{{ lookup('community.sops.sops', 'secrets.yml') | ansible.builtin.from_yaml }}"
   hosts:
     ta-lxlt:
       ansible_host: 192.168.4.58
       ansible_ssh_private_key_file: ~/.ssh/ansible
-      ansible_become_pass: "{{ sops.lxlt_become_pass }}"
+      ansible_become_pass: "{{ sops.become_pass }}"
+   
