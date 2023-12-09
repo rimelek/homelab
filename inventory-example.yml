@@ -4,10 +4,18 @@ all:
     config_apt_update: true
     config_lxd_zfs_pool_disks:
       - /dev/disk/by-id/scsi-1ATA_Samsung_SSD_850_EVO_500GB_S2RBNX0J103301N-part6
+    config_lxd_docker_vm_name: docker
+    config_lxd_docker_vm_user: manager
+    config_lxd_docker_vm_pass: "{{ sops.config_lxd_docker_vm_pass }}"
+    config_lxd_docker_vm_pass_salt: "{{ sops.config_lxd_docker_vm_pass_salt }}"
+    config_lxd_docker_vm_ssh_priv_key: ~/.ssh/ansible
     sops: "{{ lookup('community.sops.sops', 'secrets.yml') | ansible.builtin.from_yaml }}"
   hosts:
     ta-lxlt:
       ansible_host: 192.168.4.58
       ansible_ssh_private_key_file: ~/.ssh/ansible
       ansible_become_pass: "{{ sops.become_pass }}"
-   
+
+docker_vm_host_machines:
+  hosts:
+    ta-lxlt:

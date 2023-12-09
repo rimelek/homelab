@@ -77,6 +77,8 @@ Run any playbook:
 Existing playbooks:
 
 - **playbook-hello.yml**: Just a demo playbook for beginners to create a file.
+- **playbook-system-base.yml**: Installation of common tools on the hosts, including useful command line tools
 - **playbook-lxd-install.yml**: Installation of LXD to run virtual machines and containers.
 - **playbook-lxd-remove.yml**: Remove LXD
+- **playbook-lxd-docker-vm.yml**: Create and start a virtual machine
 

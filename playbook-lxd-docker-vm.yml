@@ -1,0 +1,120 @@
+
+# region play: Create the VM
+- name: Create the VM
+  hosts: docker_vm_host_machines
+  vars:
+    vm_name: "{{ config_lxd_docker_vm_name | default('docker', true) }}"
+    vm_memory: "{{ config_lxd_docker_vm_memory | default('4GiB', true)}}"
+    vm_cpu: "{{ config_lxd_docker_vm_cpus | default(4, true) }}"
+    vm_user: "{{ config_lxd_docker_vm_user | default('manager', true) }}"
+    vm_pass: "{{ config_lxd_docker_vm_pass | ansible.builtin.password_hash(salt=vm_pass_salt)  }}"
+    vm_ssh_pub_key: "{{ config_lxd_docker_vm_ssh_pub_key | default(vm_ssh_priv_key + '.pub', true) }}"
+
+    vm_pass_salt: "{{ config_lxd_docker_vm_pass_salt }}"
+    vm_ssh_priv_key: "{{ config_lxd_docker_vm_ssh_priv_key | default(ansible_ssh_private_key_file, true) }}"
+    vm_inventory_hostname: "{{
+        config_lxd_docker_vm_inventory_hostname
+        | default(vm_name + '.lxd.' + inventory_hostname, true)
+      }}"
+
+    _vm_info: "{{ _vm_info_command.stdout | from_json | first }}"
+    _ip_addresses: "{{ 
+        _vm_info.state.network
+          | dict2items
+          | map(attribute='value.addresses')
+          | flatten
+          | selectattr('family', 'equalto', 'inet')
+          | selectattr('scope', 'equalto', 'global')
+          | map(attribute='address')
+      }}"
+    _network: "{{ _vm_info.expanded_devices.eth0.network }}"
+    _network_info: "{{ _network_info_command.stdout | from_yaml }}"
+    _ip_range: "{{ _network_info.config['ipv4.address'] }}"
+    _ip: "{{
+      _ip_addresses
+        | ansible.utils.reduce_on_network(_ip_range)
+        | first
+      }}"
+  tasks:
+
+    # region task: Start Docker VM
+    - name: Start Docker VM
+      become: true
+      community.general.lxd_container:
+        url: unix:/var/snap/lxd/common/lxd/unix.socket
+        type: virtual-machine
+        state: started
+        wait_for_ipv4_addresses: true
+        name: "{{ vm_name }}"
+        source:
+          type: image
+          server: https://images.linuxcontainers.org
+          protocol: simplestreams
+          alias: ubuntu/22.04/cloud
+        config:
+          boot.autostart: "false"
+          limits.cpu: "{{ vm_cpu }}"
+          limits.memory: "{{ vm_memory }}"
+          cloud-init.user-data: |
+            #cloud-config
+            users:
+              - name: {{ vm_user }}
+                lock_passwd: false
+                groups: sudo
+                shell: /bin/bash
+                passwd: "{{ vm_pass }}"
+                ssh_authorized_keys:
+                  - {{ lookup('file', vm_ssh_pub_key) }}
+
+            packages:
+              - openssh-server
+    # endregion
+
+    # region task: Create base dir for the new SSH client config file
+    - name: Create base dir for the new SSH client config file
+      delegate_to: localhost
+      ansible.builtin.file:
+        state: directory
+        path: "{{ lookup('env', 'HOME') }}/.ssh/config.d/"
+    # endregion
+
+    # region task: Get VM info
+    - name: Get VM info
+      become: true
+      changed_when: false
+      ansible.builtin.command: lxc list "^{{ vm_name }}$" --format json
+      register: _vm_info_command
+    # endregion
+
+    # region task: Get network info
+    - name: Get network info
+      become: true
+      changed_when: false
+      ansible.builtin.command: lxc network show "{{ _network }}"
+      register: _network_info_command
+    # endregion
+
+    # region task: Add SSH client config
+    - name: Add SSH client config
+      delegate_to: localhost
+      ansible.builtin.copy:
+        dest: "{{ lookup('env', 'HOME') }}/.ssh/config.d/{{ vm_inventory_hostname }}"
+        content: |
+          Host {{ vm_inventory_hostname }}
+            Hostname {{ _ip }}
+            User manager
+            IdentityFile {{ vm_ssh_priv_key }}
+
+            ProxyJump {{ inventory_hostname }}
+    # endregion
+
+    # region task: Include the new SSH client config in the main config
+    - name: Include the new SSH client config in the main config
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        state: present
+        create: true
+        path: "{{ lookup('env', 'HOME') }}/.ssh/config"
+        line: "Include config.d/{{ vm_inventory_hostname }}"
+    # endregion
+# endregion

@@ -1,2 +1,4 @@
 ansible==8.0.0
 ansible-core==2.15.0
+netaddr==0.9.0 # for using ansible.utils.reduce_on_network()
+passlib==1.7.4 # for using ansible.builtin.password_hash()
