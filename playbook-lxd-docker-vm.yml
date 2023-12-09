@@ -58,9 +58,9 @@
         name: "{{ vm_name }}"
         source:
           type: image
-          server: https://images.linuxcontainers.org
+          server: https://cloud-images.ubuntu.com/releases
           protocol: simplestreams
-          alias: ubuntu/22.04/cloud
+          alias: "22.04"
         config:
           boot.autostart: "false"
           limits.cpu: "{{ vm_cpu }}"
