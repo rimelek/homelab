@@ -1,6 +1,5 @@
 - hosts: all
   gather_facts: false
-  tasks:
   pre_tasks:
     - name: APT update
       become: true
