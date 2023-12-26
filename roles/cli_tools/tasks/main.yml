@@ -1,0 +1,77 @@
+- name: Install common network tools like brctl and netstat
+  become: true
+  ansible.builtin.apt:
+    name:
+      - iproute2     # for ip      (ip -json link show type bridge | jq -r .[].ifname | sort)
+      - bridge-utils # for brctl   (brctl show | awk -F $'\t' '$1 != "" {print $1}' | tail -n +2)
+      - net-tools    # for netstat (netstat -tulpn)
+
+- name: Install Python3 with pip package manager for python based commands
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+      - python3-virtualenv
+
+- name: Install formatting tools for scripting and user friendly outputs
+  block:
+
+    - name: APT packages | Install formatting tools for scripting and user-friendly outputs
+      become: true
+      ansible.builtin.apt:
+        name:
+          - jq # to handle json files
+          - python3-pygments # to highlight codes with "pygmentize"
+
+    - name: Create "highlight" as a symbolic link to "pygmentize" | Install formatting tools for scripting and user-friendly outputs
+      become: true
+      ansible.builtin.file:
+        state: link
+        src: /usr/bin/pygmentize
+        dest: "{{ cli_tools_highlight_dest }}"
+
+    - ansible.builtin.include_tasks: yq.yml
+
+- name: Install packages for downloading files and webpages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+
+- name: Install tmux
+  become: true
+  ansible.builtin.apt:
+    name:
+      - tmux
+
+- name: Install packages to compress files
+  become: true
+  ansible.builtin.apt:
+    name:
+      - tar
+      - gzip
+      - zip
+      - unzip
+
+- name: Install monitoring tools
+  become: true
+  ansible.builtin.apt:
+    name:
+      - htop
+      - btop
+      - glances
+
+- name: Install manual related packages
+  become: true
+  ansible.builtin.apt:
+    name: man
+
+- name: Install editors
+  become: true
+  ansible.builtin.apt:
+    name:
+      - vim
+      - nano

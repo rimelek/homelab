@@ -1,0 +1,9 @@
+cli_tools_yq_archs:
+  x86_64:  amd64
+  amd64:   amd64
+  aarch64: arm64
+  arm64:   arm64
+
+cli_tools_yq_os: "{{ ansible_facts.system | lower }}"
+cli_tools_yq_arch: "{{ cli_tools_yq_archs[ansible_facts.architecture] }}"
+cli_tools_yq_release_name: "{{ 'yq_' + cli_tools_yq_os + '_' + cli_tools_yq_arch }}"

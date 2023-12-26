@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+  pre_tasks:
+    - name: APT update
+      become: true
+      changed_when: false
+      when: config_apt_update | default(false, true) | bool
+      ansible.builtin.apt:
+        update_cache: true
+  roles:
+    - role: cli_tools

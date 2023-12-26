@@ -1,0 +1,3 @@
+cli_tools_yq_version:
+cli_tools_yq_dest: /usr/local/bin/yq
+cli_tools_highlight_dest: /usr/local/bin/highlight
