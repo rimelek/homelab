@@ -86,7 +86,7 @@ The path of the symbolic link which will point to `/usr/bin/pygmentize`.
 Dependencies
 ------------
 
-There are no dependencies. This role can be used without depending on other roles or 
+There are no dependencies. This role can be used without depending on other roles.
 
 Example playbook
 ----------------
