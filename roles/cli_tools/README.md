@@ -98,7 +98,7 @@ Example playbook
       cli_tools_yq_version: 4.40.4
 ```
 
-Licence
+License
 -------
 
 MIT License
