@@ -24,7 +24,7 @@
   when:
     - not _yq_existing_dest_check.stat.exists or _yq_existing_version_number != _yq_desired_version_number
   vars:
-    _yq_existing_version_number: "{{ _yq_existing_version_info | regex_replace('.*version v(\\d+\\.\\d+\\.\\d+).*', '\\1') }}"
+    _yq_existing_version_number: "{{ _yq_existing_version_info.stdout | regex_replace('.*version v(\\d+\\.\\d+\\.\\d+).*', '\\1') }}"
     _yq_latest_version_number: "{{
       _yq_latest.json.html_url
         | basename
