@@ -112,7 +112,7 @@
         content: |
           Host {{ vm_inventory_hostname }}
             Hostname {{ _ip }}
-            User manager
+            User {{ vm_user }}
             IdentityFile {{ vm_ssh_priv_key }}
 
             ProxyJump {{ inventory_hostname }}
