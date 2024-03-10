@@ -11,7 +11,7 @@
     vm_ssh_pub_key: "{{ config_lxd_docker_vm_ssh_pub_key | default(vm_ssh_priv_key + '.pub', true) }}"
 
     vm_pass_salt: "{{ config_lxd_docker_vm_pass_salt }}"
-    vm_ssh_priv_key: "{{ config_lxd_docker_vm_ssh_priv_key | default(ansible_ssh_private_key_file, true) }}"
+    vm_ssh_priv_key: "{{ config_lxd_docker_vm_ssh_priv_key }}"
     vm_inventory_hostname: "{{
         config_lxd_docker_vm_inventory_hostname
         | default(vm_name + '.lxd.' + inventory_hostname, true)
@@ -35,6 +35,16 @@
         | ansible.utils.reduce_on_network(_ip_range)
         | first
       }}"
+  pre_tasks:
+    - name: Fail if config_lxd_docker_vm_ssh_priv_key is not defined
+      when: config_lxd_docker_vm_ssh_priv_key | default('', true) == ''
+      ansible.builtin.fail:
+        msg: You must set an SSH private key to log in to the VM
+
+    - name: Fail if config_lxd_docker_vm_pass_salt is not defined
+      when: config_lxd_docker_vm_pass_salt | default('', true) == ''
+      ansible.builtin.fail:
+        msg: You must set a password salt for the sudo password to log in to the VM
   tasks:
 
     # region task: Start Docker VM
