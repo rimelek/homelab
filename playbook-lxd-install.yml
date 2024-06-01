@@ -1,5 +1,6 @@
 - name: Install LXD
-  hosts: all
+  hosts: lxd_host_machines
+  gather_facts: false
   roles:
     - role: zfs_pool
       zfs_pool_name: lxd-default

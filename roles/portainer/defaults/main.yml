@@ -1,0 +1,4 @@
+portainer_name: portainer
+portainer_image: portainer/portainer-ce:2.20.2-alpine
+portainer_external_port: 9443
+portainer_volume_name: "{{ portainer_name }}_data"

@@ -2,6 +2,7 @@
 # region play: Create the VM
 - name: Create the VM
   hosts: docker_vm_host_machines
+  gather_facts: false
   vars:
     vm_name: "{{ config_lxd_docker_vm_name | default('docker', true) }}"
     vm_memory: "{{ config_lxd_docker_vm_memory | default('4GiB', true)}}"
@@ -127,4 +128,41 @@
         path: "{{ lookup('env', 'HOME') }}/.ssh/config"
         line: "Include config.d/{{ vm_inventory_hostname }}"
     # endregion
+
+    # region task: Add Docker VM to Ansible inventory
+    - name: Add Docker VM to Ansible inventory
+      changed_when: false
+      ansible.builtin.add_host:
+        groups: _lxd_docker_vm
+        hostname: "{{ vm_inventory_hostname }}"
+        ansible_user: "{{ config_lxd_docker_vm_user }}"
+        ansible_become_pass: "{{ config_lxd_docker_vm_pass }}"
+        # ansible_host is not necessary, inventory hostname will be used
+        ansible_ssh_private_key_file: "{{ vm_ssh_priv_key }}"
+        #ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        ansible_ssh_host_key_checking: false
+    # endregion
+# endregion
+
+# region play: Configure the OS in the VM
+- name: Configure the OS in the VM
+  hosts: _lxd_docker_vm
+  gather_facts: false
+  pre_tasks:
+    - name: Waiting for SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: 20
+        delay: 0
+        sleep: 3
+        connect_timeout: 2
+    - name: Update APT cache
+      become: true
+      changed_when: false
+      ansible.builtin.apt:
+        update_cache: true
+  roles:
+    - role: cli_tools
+    - role: docker
+      docker_sudo_users: "{{ config_lxd_docker_vm_docker_sudo_users | default([]) }}"
+    - role: portainer
 # endregion

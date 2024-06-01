@@ -1,5 +1,6 @@
 - name: Remove LXD
-  hosts: all
+  hosts: lxd_host_machines
+  gather_facts: false
   roles:
     - role: lxd_remove
     - role: zfs_destroy_pool

@@ -1,0 +1,7 @@
+docker_archs:
+  x86_64:  amd64
+  amd64:   amd64
+  aarch64: arm64
+  arm64:   arm64
+docker_arch: "{{ docker_archs[ansible_facts.architecture] }}"
+docker_distribution_release: "{{ ansible_facts.distribution_release }}"

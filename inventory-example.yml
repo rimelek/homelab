@@ -6,6 +6,8 @@ all:
       - /dev/disk/by-id/scsi-1ATA_Samsung_SSD_850_EVO_500GB_S2RBNX0J103301N-part6
     config_lxd_docker_vm_name: docker
     config_lxd_docker_vm_user: manager
+    config_lxd_docker_vm_docker_sudo_users:
+      - "{{ config_lxd_docker_vm_user }}"
     config_lxd_docker_vm_pass: "{{ sops.config_lxd_docker_vm_pass }}"
     config_lxd_docker_vm_pass_salt: "{{ sops.config_lxd_docker_vm_pass_salt }}"
     config_lxd_docker_vm_ssh_priv_key: ~/.ssh/ansible
@@ -17,5 +19,9 @@ all:
       ansible_become_pass: "{{ sops.become_pass }}"
 
 docker_vm_host_machines:
+  hosts:
+    ta-lxlt:
+
+lxd_host_machines:
   hosts:
     ta-lxlt:

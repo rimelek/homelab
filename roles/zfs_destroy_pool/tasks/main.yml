@@ -13,6 +13,13 @@
   ansible.builtin.fail:
     msg: 'User input was: {{ _confirmation_prompt.user_input | to_json }}, not "yes". Aborting.'
 
+# To fix the issue of missing ZFS pool after uninstalling LXD
+- name: Restart ZFS import cache
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    name: zfs-import-cache
+
 - name: Get zpool facts
   ignore_errors: true
   community.general.zpool_facts:

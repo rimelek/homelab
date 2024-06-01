@@ -1,0 +1,102 @@
+- name: Install dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+
+- name: Make sure the folder of the keyrings exists
+  become: true
+  ansible.builtin.file:
+    state: directory
+    mode: 0755
+    path: /etc/apt/keyrings
+
+- name: Install the APT key of Docker's APT repo
+  become: true
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: a+r
+    
+- name: Get distribution release fact
+  ansible.builtin.setup:
+    gather_subset:
+      - distribution_release
+      - architecture
+
+- name: Add Docker APT repository
+  become: true
+  ansible.builtin.apt_repository:
+    filename: docker
+    repo: "deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ docker_distribution_release }} stable"
+    state: present
+    update_cache: true
+
+- name: Get full package version for {{ docker_version }}
+  changed_when: false
+  ansible.builtin.shell: |
+    apt-cache madison docker-ce \
+    | awk '$3 ~ /^([0-9]+:){{ docker_version | replace('*', '[0-9]+') | replace('.', '\.') }}(-[0-9]+)?(~.*)$/ {print $3}'
+  register: _docker_versions_command
+
+- name: Install Docker CE
+  become: true
+  vars:
+    _full_version: "{{ _docker_versions_command.stdout_lines[0] }}"
+  ansible.builtin.apt:
+    name:
+      - docker-ce={{ _full_version }}
+      - docker-ce-cli={{ _full_version }}
+      - docker-ce-rootless-extras={{ _full_version }}
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+
+- name: Hold Docker CE packages
+  become: true
+  ansible.builtin.command: apt-mark hold docker-ce docker-ce-cli docker-ce-rootless-extras containerd.io docker-compose-plugin
+  changed_when: false
+
+- name: Ensure group "docker-sudo" exists
+  become: true
+  ansible.builtin.group:
+    name: docker-sudo
+    state: present
+
+- name: Check if docker sudo users are existing users
+  become: true
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ item }}"
+  loop: "{{ docker_sudo_users }}"
+
+- name: Add users to the docker-sudo group
+  become: true
+  ansible.builtin.user:
+    name: "{{ item }}"
+    # users must be added to docker-sudo group without removing them from other groups
+    append: true
+    groups:
+      - docker-sudo
+  loop: "{{ docker_sudo_users }}"
+
+- name: Create a sudo wrapper for Docker
+  become: true
+  ansible.builtin.copy:
+    content: |
+      #!/usr/bin/env sh
+
+      exec sudo /usr/bin/docker "$@"
+    dest: /usr/local/bin/docker
+    mode: 0755
+
+- name: Allow run execute /usr/bin/docker as root without password
+  become: true
+  ansible.builtin.copy:
+    content: |
+      %docker-sudo ALL=(root) NOPASSWD: /usr/bin/docker
+    dest: /etc/sudoers.d/docker
+
+
+  
